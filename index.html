@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PODER CIUDADANO - Cuestionario Constitucional</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="data:,">
+  
+  <style>
+    :root {
+      /* MODO CLARO (Default - Colores Bandera Argentina) */
+      --bg-gradient: linear-gradient(180deg, #74ACDF 0%, #BFE6FF 35%, #FFFFFF 50%, #BFE6FF 65%, #74ACDF 100%);
+      --card-bg: #FFFFFF;
+      --azul-central: #5151FF;
+      --amarillo-central: #FFCC00;
+      --gris-borde: #CCE0F5;
+      --texto-color: #1A1A1A;
+      --texto-secundario: #475569;
+
+      /* Cajas de respuesta Modo Claro */
+      --verde-resumida-bg: #E8F5E9;
+      --verde-resumida-borde: #2E7D32;
+      --naranja-ampliada-bg: #FFF3E0;
+      --naranja-ampliada-borde: #E65100;
+    }
+
+    /* ESTILOS PARA MODO OSCURO (NOCHE) */
+    body.dark-mode {
+      --bg-gradient: linear-gradient(180deg, #0B192C 0%, #1E3E62 50%, #0B192C 100%);
+      --card-bg: #1E293B;
+      --azul-central: #0F172A;
+      --amarillo-central: #FFCC00;
+      --gris-borde: #334155;
+      --texto-color: #F8FAFC;
+      --texto-secundario: #94A3B8;
+
+      /* Cajas de respuesta Modo Oscuro */
+      --verde-resumida-bg: #064E3B;
+      --verde-resumida-borde: #34D399;
+      --naranja-ampliada-bg: #7C2D12;
+      --naranja-ampliada-borde: #FB923C;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    }
+
+    /* FONDO ADAPTABLE */
+    body {
+      background: var(--bg-gradient);
+      background-attachment: fixed;
+      display: flex;
+      justify-content: center;
+      padding: 10px;
+      min-height: 100vh;
+    }
+
+    .app-card {
+      width: 100%;
+      max-width: 480px;
+      background-color: var(--card-bg);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+      border: 2px solid var(--azul-central);
+      display: flex;
+      flex-direction: column;
+      min-height: 90vh;
+    }
+
+    .header {
+      background-color: var(--azul-central);
+      color: #FFFFFF;
+      padding: 20px;
+      text-align: center;
+      border-bottom: 4px solid var(--amarillo-central);
+      position: relative;
+    }
+
+    .header h1 {
+      color: var(--amarillo-central);
+      font-size: 1.5rem;
+      font-weight: 900;
+      letter-spacing: 1px;
+    }
+
+    .header p {
+      font-size: 0.8rem;
+      margin-top: 4px;
+      opacity: 0.9;
+    }
+
+    /* BOTÓN MODO CLARO / OSCURO */
+    .theme-toggle-btn {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid var(--amarillo-central);
+      color: #FFFFFF;
+      font-size: 1.1rem;
+      padding: 6px 10px;
+      border-radius: 50%;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .theme-toggle-btn:hover {
+      background: var(--amarillo-central);
+      color: var(--azul-central);
+    }
+
+    .btn-instalar {
+      display: none;
+      margin-top: 10px;
+      padding: 6px 14px;
+      background-color: var(--amarillo-central);
+      color: var(--azul-central);
+      border: none;
+      border-radius: 12px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+
+    .content {
+      padding: 15px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* BUSCADOR */
+    .search-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 10px 45px 10px 15px;
+      border-radius: 20px;
+      border: 1px solid var(--gris-borde);
+      background-color: var(--card-bg);
+      color: var(--texto-color);
+      font-size: 0.85rem;
+      outline: none;
+    }
+
+    .mic-btn {
+      position: absolute;
+      right: 12px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1.1rem;
+      color: var(--amarillo-central);
+    }
+
+    /* ACORDEÓN CATEGORIZADO DE 20 SECCIONES */
+    .acordeon-menu-container {
+      width: 100%;
+      position: relative;
+    }
+
+    .acordeon-btn {
+      width: 100%;
+      padding: 12px 16px;
+      background-color: var(--card-bg);
+      border: 1.5px solid var(--gris-borde);
+      border-radius: 20px;
+      color: var(--texto-color);
+      font-weight: 700;
+      font-size: 0.85rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .acordeon-content {
+      display: none;
+      background: var(--card-bg);
+      border: 1px solid var(--gris-borde);
+      border-radius: 12px;
+      margin-top: 6px;
+      max-height: 280px;
+      overflow-y: auto;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      z-index: 10;
+      position: relative;
+    }
+
+    .acordeon-content.show { display: block; }
+
+    .categoria-header {
+      padding: 10px 14px;
+      background-color: rgba(0,0,0,0.03);
+      border-bottom: 1px solid var(--gris-borde);
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--texto-color);
+      display: flex;
+      justify-content: space-between;
+      cursor: pointer;
+    }
+
+    .submenu-preguntas { display: none; background: var(--card-bg); }
+    .submenu-preguntas.active { display: block; }
+
+    .pregunta-opcion {
+      padding: 8px 14px;
+      font-size: 0.78rem;
+      color: var(--texto-secundario);
+      border-bottom: 1px dashed var(--gris-borde);
+      cursor: pointer;
+    }
+
+    .pregunta-opcion:hover {
+      background-color: rgba(255, 204, 0, 0.2);
+      color: var(--texto-color);
+      font-weight: 600;
+    }
+
+    .pregunta-card {
+      background-color: rgba(0,0,0,0.02);
+      border: 1px solid var(--gris-borde);
+      border-radius: 12px;
+      padding: 12px 15px;
+    }
+
+    .pregunta-titulo {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--texto-color);
+    }
+
+    /* CAJAS DE RESPUESTA ADAPTABLES */
+    .respuesta-box {
+      border-radius: 10px;
+      border: 1px solid var(--gris-borde);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .resumida-box {
+      background-color: var(--verde-resumida-bg);
+      border-left: 5px solid var(--verde-resumida-borde);
+    }
+
+    .ampliada-box {
+      background-color: var(--naranja-ampliada-bg);
+      border-left: 5px solid var(--naranja-ampliada-borde);
+    }
+
+    .respuesta-header {
+      padding: 8px 12px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      background-color: rgba(0, 0, 0, 0.05);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .resumida-box .respuesta-header { color: var(--verde-resumida-borde); }
+    .ampliada-box .respuesta-header { color: var(--naranja-ampliada-borde); }
+
+    .btn-audio {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .respuesta-cuerpo {
+      padding: 12px;
+      font-size: 0.82rem;
+      color: var(--texto-color);
+      line-height: 1.4;
+      min-height: 50px;
+    }
+
+    .controles-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: auto;
+      padding-top: 10px;
+    }
+
+    .btn-nav {
+      padding: 8px 18px;
+      border-radius: 12px;
+      border: none;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    .btn-anterior { background-color: var(--gris-borde); color: var(--texto-secundario); }
+    .btn-siguiente { background-color: var(--azul-central); color: var(--amarillo-central); }
+    .contador-texto { font-size: 0.85rem; font-weight: 700; color: var(--texto-color); }
+
+    /* FOOTER Y BANNERS */
+    .footer {
+      background-color: var(--azul-central);
+      padding: 15px;
+      text-align: center;
+      color: #FFFFFF;
+      font-size: 0.75rem;
+      border-top: 3px solid var(--amarillo-central);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .redes-iconos {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .red-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background-color: rgba(255, 255, 255, 0.15);
+      color: #FFFFFF;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: bold;
+      font-size: 0.85rem;
+      text-decoration: none;
+      border: 1px solid rgba(255, 204, 0, 0.3);
+      transition: all 0.3s;
+    }
+
+    .red-btn:hover {
+      background-color: var(--amarillo-central);
+      color: var(--azul-central);
+    }
+
+    .banner-publicidad-container {
+      width: 100%;
+      max-width: 420px;
+      background-color: #FFFFFF;
+      padding: 6px;
+      border-radius: 12px;
+      border: 1px solid var(--gris-borde);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .banner-img {
+      width: 100%;
+      height: auto;
+      max-height: 85px;
+      object-fit: contain;
+      border-radius: 8px;
+      transition: opacity 0.5s ease-in-out;
+    }
+
+    .banner-img.fade-out { opacity: 0.2; }
+  </style>
+</head>
+<body>
+
+  <div class="app-card">
+    
+    <div class="header">
+      <button class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Cambiar Modo Claro/Oscuro">🌙</button>
+      <h1>PODER CIUDADANO</h1>
+      <p>La Constitución Nacional Siempre Contigo</p>
+      <button id="btnInstalarPWA" class="btn-instalar">📲 Instalar App en el Dispositivo</button>
+    </div>
+
+    <div class="content">
+      
+      <!-- BUSCADOR -->
+      <div class="search-container">
+        <input type="text" id="searchInput" class="search-input" placeholder="Buscar pregunta por texto o voz..." onkeyup="filtrarPreguntas()">
+        <button class="mic-btn" onclick="iniciarReconocimientoVoz()" title="Dictar por voz">🎤</button>
+      </div>
+
+      <!-- ACORDEÓN CATEGORIZADO (20 CATEGORÍAS) -->
+      <div class="acordeon-menu-container">
+        <button class="acordeon-btn" onclick="toggleAcordeon()">
+          <span id="labelAcordeon">📂 Seleccionar por Categoría</span>
+          <span id="flechaMenu">▼</span>
+        </button>
+
+        <div class="acordeon-content" id="acordeonContent">
+          <div class="categoria-item"><div class="categoria-header" onclick="toggleSubmenu(this)"><span>📜 Fundamentos Del Sistema Constitucional</span> <span>+</span></div><div class="submenu-preguntas" id="cat-1"></div></div>
+          <div class="categoria-item"><div class="categoria-header" onclick="toggleSubmenu(this)"><span>🏛️ Poder Legislativo</span> <span>+</span></div><div class="submenu-preguntas" id="cat-2"></div></div>
+          <div class="categoria-item"><div class="categoria-header" onclick="toggleSubmenu(this)"><span>👔 Poder Ejecutivo</span> <span>+</span></div><div class="submenu-preguntas" id="cat-3"></div></div>
+          <div class="categoria-item"><div class="categoria-header" onclick="toggleSubmenu(this)"><span>⚖️ Poder Judicial</span> <span>+</span></div><div class="submenu-preguntas" id="cat-4"></div></div>
+          <div class="categoria-item"><div class="categoria-header" onclick="toggleSubmenu(this)"><span>🕊️ Derechos Civiles Y Libertades Individuales</span> <span>+</span></div><div class="submenu-preguntas" id="cat-5"></div></div>
+          <div class="categoria-item"><div class="categoria-header" onclick="toggleSubmenu(this)"><span>🛡️ Garantías Constitucionales</span> <span>+</span></div><div class="submenu-preguntas" id="cat-6"></div></div>
+          <div class="categoria-item"><div class="categoria-header" onclick="toggleSubmenu(this)"><span>🗳️ Democracia Y Ciudadanía</span> <span>+</span></div><div class="submenu-preguntas" id="cat-7"></div></div>
+          <div class="categoria-item"><div class="categoria-header" onclick="toggleSubmenu(this)"><span>💼 Derechos Laborales Y Seguridad Social</span> <span>+</span></div><div class="submenu-preguntas" id="cat-8"></div></div>
+          <div class="categoria-item"><div class="categoria-header" onclick="toggleSubmenu(this)"><span>🎓 Derecho A La Educación - Salud Y Vivienda (I)</span> <span>+</span></div><div class="submenu-preguntas" id="cat-9"></div></div>
+          <div class="categoria-item"><div class="categoria-header" onclick="toggleSubmenu(this)"><span>🌱 Derechos Culturales Y Ambientales</span> <span>+</span></div><div class="submenu-preguntas" id="cat-10"></div></div>
+          <div class="categoria-item"><div class="categoria-header" onclick="toggleSubmenu(this)"><span>👮 Seguridad Pública Y Derechos Humanos</span> <span>+</span></div><div class="submenu-preguntas" id="cat-11"></div></div>
+          <div class="categoria-item"><div class="categoria-header" onclick="toggleSubmenu(this)"><span>🚨 Estados De Excepción Y Emergencias</span> <span>+</span></div><div class="submenu-preguntas" id="cat-12"></div></div>
+          <div class="categoria-item"><div class="categoria-header" onclick="toggleSubmenu(this)"><span>🤝 Fundamentos De Los Derechos Humanos</span> <span>+</span></div><div class="submenu-preguntas" id="cat-13"></div></div>
+          <div class="categoria-item"><div class="categoria-header" onclick="toggleSubmenu(this)"><span>🌐 Tratados Internacionales</span> <span>+</span></div><div class="submenu-preguntas" id="cat-14"></div></div>
+          <div class="categoria-item"><div class="categoria-header" onclick="toggleSubmenu(this)"><span>🏥 Derecho A La Educación - Salud Y Vivienda (II)</span> <span>+</span></div><div class="submenu-preguntas" id="cat-15"></div></div>
+          <div class="categoria-item"><div class="categoria-header" onclick="toggleSubmenu(this)"><span>👤 Derechos Humanos Específicos</span> <span>+</span></div><div class="submenu-preguntas" id="cat-16"></div></div>
+          <div class="categoria-item"><div class="categoria-header" onclick="toggleSubmenu(this)"><span>🏡 Derecho A La Educación - Salud Y Vivienda (III)</span> <span>+</span></div><div class="submenu-preguntas" id="cat-17"></div></div>
+          <div class="categoria-item"><div class="categoria-header" onclick="toggleSubmenu(this)"><span>💻 Tecnología Datos Y Ciudadanía Digital</span> <span>+</span></div><div class="submenu-preguntas" id="cat-18"></div></div>
+          <div class="categoria-item"><div class="categoria-header" onclick="toggleSubmenu(this)"><span>🛠️ Herramientas Prácticas Para La Ciudadanía</span> <span>+</span></div><div class="submenu-preguntas" id="cat-19"></div></div>
+          <div class="categoria-item"><div class="categoria-header" onclick="toggleSubmenu(this)"><span>🔎 Preguntas Críticas Y Debates Contemporáneos</span> <span>+</span></div><div class="submenu-preguntas" id="cat-20"></div></div>
+        </div>
+      </div>
+
+      <!-- TARJETA PREGUNTA -->
+      <div class="pregunta-card">
+        <div class="pregunta-titulo" id="preguntaTexto">Cargando datos...</div>
+      </div>
+
+      <!-- RESPUESTAS -->
+      <div class="respuesta-box resumida-box">
+        <div class="respuesta-header">
+          <span>🌱 Nivel Básico / Resumida</span>
+          <button class="btn-audio" onclick="leerTexto('resumida')" title="Escuchar texto">🔊</button>
+        </div>
+        <div class="respuesta-cuerpo" id="respuestaResumida">...</div>
+      </div>
+
+      <div class="respuesta-box ampliada-box">
+        <div class="respuesta-header">
+          <span>🚀 Nivel Avanzado / Ampliado</span>
+          <button class="btn-audio" onclick="leerTexto('ampliada')" title="Escuchar texto">🔊</button>
+        </div>
+        <div class="respuesta-cuerpo" id="respuestaAmpliada">...</div>
+      </div>
+
+      <!-- CONTROLES -->
+      <div class="controles-nav">
+        <button class="btn-nav btn-anterior" onclick="cambiarPregunta(-1)">Anterior</button>
+        <span class="contador-texto" id="contadorText">0 de 0</span>
+        <button class="btn-nav btn-siguiente" onclick="cambiarPregunta(1)">Siguiente</button>
+      </div>
+
+    </div>
+
+    <!-- FOOTER Y PUBLICIDAD -->
+    <div class="footer">
+      <div class="redes-iconos">
+        <a href="https://facebook.com" target="_blank" class="red-btn">F</a>
+        <a href="https://x.com" target="_blank" class="red-btn">X</a>
+        <a href="https://api.whatsapp.com" target="_blank" class="red-btn">W</a>
+        <a href="mailto:contacto@poderciudadano.com" class="red-btn">M</a>
+      </div>
+
+      <p>© 2026 Poder Ciudadano • Desarrollado para la Ciudadanía</p>
+
+      <div class="banner-publicidad-container">
+        <a id="bannerLink" href="#" target="_blank" rel="noopener noreferrer">
+          <img id="bannerImg" src="imagenes/banner1.png" alt="Publicidad" class="banner-img" onerror="this.onerror=null; this.src='imagenes/banner1.jpg';">
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    let preguntas = [];
+    let indiceActual = 0;
+
+    // ARRAY DE BANNERS (Comprueba imágenes .png y .jpg)
+    const listaBanners = [
+      { img: 'imagenes/afilia-temu.png', url: 'https://temu.to/k/gvymnw1et80' },
+      { img: 'imagenes/banner-2.png', url: 'https://canva.link/x04hvs31zx69uvq' },
+      { img: 'imagenes/b-bytelixir.png', url: 'https://bytelixir.com/r/L7OJBZORFEWR' },
+      { img: 'imagenes/b-honeygain.png', url: 'https://join.honeygain.com/ORLANA2D7D' },
+      { img: 'imagenes/encuesta-1.png', url: 'https://www.greenpanthera.com/us/?rf=fe23651450ef26' },
+      { img: 'imagenes/encuesta-2.png', url: 'https://grabpoints.com?ref=DJTP8J' }
+    ];
+    let indiceBanner = 0;
+
+    // LÓGICA MODO CLARO / OSCURO
+    function toggleTheme() {
+      const isDark = document.body.classList.toggle('dark-mode');
+      const btn = document.getElementById('themeToggleBtn');
+      if (btn) btn.textContent = isDark ? '☀️' : '🌙';
+      localStorage.setItem('theme_preference', isDark ? 'dark' : 'light');
+    }
+
+    function cargarTemaGuardado() {
+      const pref = localStorage.getItem('theme_preference');
+      const btn = document.getElementById('themeToggleBtn');
+      if (pref === 'dark') {
+        document.body.classList.add('dark-mode');
+        if (btn) btn.textContent = '☀️';
+      }
+    }
+
+    async function cargarPreguntas() {
+      try {
+        const res = await fetch('preguntas.json');
+        if (!res.ok) throw new Error("Error en la lectura de preguntas.json");
+        
+        preguntas = await res.json();
+        if (preguntas.length > 0) {
+          renderizarPregunta(0);
+          poblarAcordeon();
+        }
+      } catch (err) {
+        document.getElementById('preguntaTexto').textContent = "Error al conectar preguntas.json";
+        console.error(err);
+      }
+    }
+
+    function renderizarPregunta(index) {
+      if (index < 0 || index >= preguntas.length) return;
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+
+      indiceActual = index;
+      const item = preguntas[index];
+
+      document.getElementById('preguntaTexto').textContent = `${item.id}. ${item.pregunta || ''}`;
+      
+      efectoTipeo(document.getElementById('respuestaResumida'), item.respuesta_resumida || '');
+      efectoTipeo(document.getElementById('respuestaAmpliada'), item.respuesta_ampliada || '');
+
+      document.getElementById('contadorText').textContent = `${item.id} de ${preguntas.length}`;
+    }
+
+    function cambiarPregunta(direccion) {
+      const nuevoIndex = indiceActual + direccion;
+      if (nuevoIndex >= 0 && nuevoIndex < preguntas.length) {
+        renderizarPregunta(nuevoIndex);
+      }
+    }
+
+    function efectoTipeo(elemento, texto) {
+      if (!elemento) return;
+      elemento.textContent = "";
+      if (!texto || typeof texto !== 'string') return;
+
+      let i = 0;
+      function escribir() {
+        if (i < texto.length) {
+          elemento.textContent += texto.charAt(i);
+          i++;
+          setTimeout(escribir, 10);
+        }
+      }
+      escribir();
+    }
+
+    function poblarAcordeon() {
+      preguntas.forEach(item => {
+        let catId = 1;
+        const id = item.id;
+
+        if (id >= 1 && id <= 30) catId = 1;
+        else if (id >= 31 && id <= 50) catId = 2;
+        else if (id >= 51 && id <= 70) catId = 3;
+        else if (id >= 71 && id <= 90) catId = 4;
+        else if (id >= 91 && id <= 120) catId = 5;
+        else if (id >= 121 && id <= 140) catId = 6;
+        else if (id >= 141 && id <= 170) catId = 7;
+        else if (id >= 171 && id <= 185) catId = 8;
+        else if (id >= 186 && id <= 200) catId = 9;
+        else if (id >= 201 && id <= 215) catId = 10;
+        else if (id >= 216 && id <= 230) catId = 11;
+        else if (id >= 231 && id <= 240) catId = 12;
+        else if (id >= 241 && id <= 255) catId = 13;
+        else if (id >= 256 && id <= 275) catId = 14;
+        else if (id >= 276 && id <= 280) catId = 15;
+        else if (id >= 281 && id <= 295) catId = 16;
+        else if (id >= 296 && id <= 300) catId = 17;
+        else if (id >= 301 && id <= 315) catId = 18;
+        else if (id >= 316 && id <= 330) catId = 19;
+        else if (id >= 331 && id <= 370) catId = 20;
+
+        const cont = document.getElementById(`cat-${catId}`);
+        if (cont) {
+          const div = document.createElement('div');
+          div.className = 'pregunta-opcion';
+          div.textContent = `${item.id}. ${item.pregunta}`;
+          div.onclick = () => {
+            renderizarPregunta(item.id - 1);
+            toggleAcordeon();
+          };
+          cont.appendChild(div);
+        }
+      });
+    }
+
+    function toggleAcordeon() {
+      const content = document.getElementById('acordeonContent');
+      const flecha = document.getElementById('flechaMenu');
+      content.classList.toggle('show');
+      flecha.textContent = content.classList.contains('show') ? '▲' : '▼';
+    }
+
+    function toggleSubmenu(header) {
+      const submenu = header.nextElementSibling;
+      submenu.classList.toggle('active');
+    }
+
+    function filtrarPreguntas() {
+      const input = document.getElementById('searchInput');
+      if (input) buscarPorTexto(input.value);
+    }
+
+    function buscarPorTexto(texto) {
+      const textoBuscado = limpiarTexto(texto);
+      if (!textoBuscado || textoBuscado.trim() === "") return;
+
+      const palabrasClave = textoBuscado.split(' ').filter(p => p.length > 2);
+      if (palabrasClave.length === 0) return;
+
+      let mejorMatchIndex = -1;
+      let maxCoincidencias = 0;
+
+      preguntas.forEach((p, index) => {
+        const preguntaLimpia = limpiarTexto(p.pregunta);
+        let coincidencias = 0;
+        palabrasClave.forEach(palabra => {
+          if (preguntaLimpia.includes(palabra)) coincidencias++;
+        });
+
+        if (coincidencias > maxCoincidencias) {
+          maxCoincidencias = coincidencias;
+          mejorMatchIndex = index;
+        }
+      });
+
+      if (mejorMatchIndex !== -1) renderizarPregunta(mejorMatchIndex);
+    }
+
+    function limpiarTexto(str) {
+      if (!str) return "";
+      return str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[¿?¡!.,]/g, "").trim();
+    }
+
+    function iniciarReconocimientoVoz() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        alert("Tu navegador no soporta voz nativa.");
+        return;
+      }
+
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'es-AR';
+      const inputSearch = document.getElementById('searchInput');
+
+      recognition.onstart = () => { if (inputSearch) inputSearch.placeholder = "🎙️ Escuchando..."; };
+      recognition.onresult = (e) => {
+        const texto = e.results[0][0].transcript;
+        if (inputSearch) {
+          inputSearch.value = texto;
+          inputSearch.placeholder = "Buscar pregunta por texto o voz...";
+        }
+        buscarPorTexto(texto);
+      };
+      recognition.start();
+    }
+
+    function leerTexto(tipo) {
+      if (!('speechSynthesis' in window)) return;
+      window.speechSynthesis.cancel();
+
+      let texto = (tipo === 'resumida') 
+        ? document.getElementById('respuestaResumida').textContent 
+        : document.getElementById('respuestaAmpliada').textContent;
+
+      if (!texto || texto === "...") return;
+
+      const utterance = new SpeechSynthesisUtterance(texto);
+      utterance.lang = 'es-AR';
+      window.speechSynthesis.speak(utterance);
+    }
+
+    function rotarBanner() {
+      const img = document.getElementById('bannerImg');
+      const link = document.getElementById('bannerLink');
+      if (!img || !link) return;
+
+      img.classList.add('fade-out');
+      setTimeout(() => {
+        indiceBanner = (indiceBanner + 1) % listaBanners.length;
+        const b = listaBanners[indiceBanner];
+        img.src = b.img;
+        link.href = b.url;
+        img.classList.remove('fade-out');
+      }, 500);
+    }
+
+    let diferidoInstalacion;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      diferidoInstalacion = e;
+      const btn = document.getElementById('btnInstalarPWA');
+      if (btn) {
+        btn.style.display = 'inline-block';
+        btn.addEventListener('click', async () => {
+          btn.style.display = 'none';
+          if (diferidoInstalacion) {
+            diferidoInstalacion.prompt();
+            diferidoInstalacion = null;
+          }
+        });
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      cargarTemaGuardado();
+      cargarPreguntas();
+      setInterval(rotarBanner, 5000);
+    });
+  </script>
+</body>
+</html>
